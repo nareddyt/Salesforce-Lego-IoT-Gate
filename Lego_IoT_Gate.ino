@@ -104,6 +104,8 @@ void loop() {
 }
 
 void changeState() {
+  pprint("IN", inCount);
+  pprint("OUT", outCount);
 
   if (inCount >= outCount * 2 && middleGateState == OUT) {
     // Too many INs
