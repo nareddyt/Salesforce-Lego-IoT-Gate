@@ -19,10 +19,13 @@ int outCount = 1;
 int inCount = 1;
 enum state middleGateState = IN;
 
-// Previous sensor values
-int prevRight = 0;
-int prevMiddle = 0;
-int prevLeft = 0;
+// Bit history of gates
+int leftHistory = 0b1;
+int middleHistory = 0b1;
+int rightHistory = 0b1;
+int leftTrig = false;
+int middleTrig = false;
+int rightTrig = false;
 
 void setup() {
   // set the digital pin as output:
@@ -54,49 +57,68 @@ void loop() {
   int rightLightInput = digitalRead(rightLightPin);
 
   // Check for spikes in values
-  if (leftLightInput == 0 && prevLeft == 1) {
+  if (leftHistory == 0 && !leftTrig) {
     inCount += 1;
+    leftTrig = true;
     Serial.println("Left gate triggered");
   }
-  if (rightLightInput == 0 && prevRight == 1) {
+  if (rightHistory == 0 && !rightTrig) {
     outCount += 1;
+    rightTrig = true;
     Serial.println("Right gate triggered");
   }
-  if (middleLightInput == 0 && prevMiddle == 1) {
+  if (middleHistory == 0 && !middleTrig) {
     Serial.println("Middle gate triggered");
     if (middleGateState == IN) {
       inCount += 1;
     } else {
       outCount += 1;
     }
+    middleTrig = true;
   }
 
-  // Update temp values
-  prevLeft = leftLightInput;
-  prevMiddle = middleLightInput;
-  prevRight = rightLightInput;
+  // Reset triggers
+  if (leftHistory == 0b11111111111111111111 && leftTrig) {
+    leftTrig = false;
+    Serial.println("Left gate reset");
+  }
+  if (rightHistory == 0b11111111111111111111 && rightTrig) {
+    rightTrig = false;
+    Serial.println("Right gate reset");
+  }
+  if (middleHistory == 0b11111111111111111111 && middleTrig) {
+    Serial.println("Middle gate reset");
+    middleTrig = false;
+  }
+
+  // Update histories
+  leftHistory = leftHistory << 1;
+  leftHistory &= 0b11111111111111111111;
+  leftHistory |= leftLightInput;
+  middleHistory = middleHistory << 1;
+  middleHistory &= 0b11111111111111111111;;
+  middleHistory |= middleLightInput;
+  rightHistory = rightHistory << 1;
+  rightHistory &= 0b11111111111111111111;;
+  rightHistory |= rightLightInput;
 }
 
 void changeState() {
-  enum state tempMiddleGateState = middleGateState;
 
-  if (inCount >= outCount * 2) {
+  if (inCount >= outCount * 2 && middleGateState == OUT) {
     // Too many INs
-    tempMiddleGateState = IN;
+    middleGateState = IN;
     digitalWrite(middleLEDPin, HIGH);
     Serial.println("Changing state to IN");
-  } else if (outCount >= inCount * 2) {
+  } else if (outCount >= inCount * 2 && middleGateState == IN) {
     // Too many OUTs
-    tempMiddleGateState = OUT;
+    middleGateState = OUT;
     digitalWrite(middleLEDPin, LOW);
     Serial.println("Changing state to OUT");
   } else {
     // Else gate will stay the same
-    pprint("Keeping state the same", tempMiddleGateState);
+    pprinte("Keeping state the same", middleGateState);
   }
-  
-  // Change gate status
-  middleGateState = tempMiddleGateState;
 
   // Reseting counts
   inCount = 1;
@@ -104,6 +126,12 @@ void changeState() {
 }
 
 void pprint(String label, int val) {
+  String toPrint = label + ": ";
+  toPrint += val;
+  Serial.println(toPrint);
+}
+
+void pprinte(String label, enum state val) {
   String toPrint = label + ": ";
   toPrint += val;
   Serial.println(toPrint);
