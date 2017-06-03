@@ -5,7 +5,7 @@ Timer t;
 // WiFi parameters to be configured
 const char* ssid = "exitroute";
 const char* password = "489YLQZV";
-const char* host = "http://iot-gate-proxy.azurewebsites.net/";
+const char* host = "iot-gate-proxy.azurewebsites.net";
 WiFiClient client;
 
 // Constants
@@ -161,17 +161,20 @@ void sendEvent(int gateID , String gateStatus , int riderCountIN , int riderCoun
     Serial.println("This is the json file: " + json + "\n");
     Serial.println("Requesting POST: ");
      // Send request to the server:
-     if (client.connect(host, 80)) {
+     if (client.connect(host,80)) {
        Serial.println("Connected to host!");
-       client.println("POST /endpoint HTTP/1.1");
+       client.println("POST /endpoint");
        client.println("Host: http://iot-gate-proxy.azurewebsites.net");
+       //client.println("POST /iot-gate-proxy.azurewebsites.net/endpoint");
        client.println("Accept: */*");
-       client.println("Content-Type: application/x-www-form-urlencoded");
+       //client.println("Content-Type: application/x-www-form-urlencoded");
+       client.println("Content-Type: application/json");
        client.print("Content-Length: ");
        client.println(json.length());
        client.println();
        client.println(json);
        client.println("Connection: close");
+       client.println();
      }
 
      unsigned long timeout = millis();
