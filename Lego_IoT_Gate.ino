@@ -3,8 +3,8 @@
 
 Timer t;
 // WiFi parameters to be configured
-const char* ssid = "exitroute";
-const char* password = "489YLQZV";
+const char* ssid = "LegoHotspot";
+const char* password = "legolego";
 const char* host = "iot-gate-proxy.azurewebsites.net";
 WiFiClient client;
 
