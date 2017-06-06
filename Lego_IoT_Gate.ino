@@ -46,7 +46,7 @@ void setup() {
     // Start serial mode
     Serial.begin(9600);
     wifiSetup();
-    t.every(5000, changeState);
+    t.every(10000, changeState);
 }
 
 void loop() {
@@ -163,18 +163,30 @@ void sendEvent(int gateID , String gateStatus , int riderCountIN , int riderCoun
      // Send request to the server:
      if (client.connect(host,80)) {
        Serial.println("Connected to host!");
-       client.println("POST /endpoint");
-       client.println("Host: http://iot-gate-proxy.azurewebsites.net");
-       //client.println("POST /iot-gate-proxy.azurewebsites.net/endpoint");
-       client.println("Accept: */*");
-       //client.println("Content-Type: application/x-www-form-urlencoded");
-       client.println("Content-Type: application/json");
-       client.print("Content-Length: ");
-       client.println(json.length());
-       client.println();
-       client.println(json);
-       client.println("Connection: close");
-       client.println();
+
+//       client.println("http://iot-gate-proxy.azurewebsites.net/endpoint");
+//       client.println("POST /endpoint HTTP/1.1");
+//       client.println();
+//       client.println("Host: http://iot-gate-proxy.azurewebsites.net");
+//       client.println("Accept: */*");
+//       //client.println("Content-Type: application/x-www-form-urlencoded");
+//       client.println("Content-Type: application/json");
+//       client.print("Content-Length: ");
+//       client.println(json.length());
+//       client.println();
+//       client.println(json);
+
+       String req = "";
+       req += "POST /endpoint HTTP/1.1\r\n";
+       req += "Host: iot-gate-proxy.azurewebsites.net\r\n";
+       req += "Accept: */*\r\n";
+       req += "Content-Type: application/x-www-form-urlencoded\r\n";
+       req += "Content-Length: " + String(json.length());
+       req += "\r\n\r\n";
+       req += json + "\r\n";
+
+       Serial.println(req);
+       client.print(req);
      }
 
      unsigned long timeout = millis();
