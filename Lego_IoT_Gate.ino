@@ -41,7 +41,7 @@ void setup() {
     pinMode(middleLightPin, INPUT_PULLUP);
     pinMode(rightLightPin, INPUT_PULLUP);
     digitalWrite(leftLEDPin, HIGH);
-    digitalWrite(middleLEDPin, LOW);
+    digitalWrite(middleLEDPin, HIGH);
     digitalWrite(rightLEDPin, LOW);
     // Start serial mode
     Serial.begin(9600);
@@ -82,14 +82,14 @@ void loop() {
     // Reset triggers
     if (leftHistory == 0b11111111111111111111 && leftTrig) {
       leftTrig = false;
-      Serial.println("Left gate reset");
+//      Serial.println("Left gate reset");
     }
     if (rightHistory == 0b11111111111111111111 && rightTrig) {
       rightTrig = false;
-      Serial.println("Right gate reset");
+//      Serial.println("Right gate reset");
     }
     if (middleHistory == 0b11111111111111111111 && middleTrig) {
-      Serial.println("Middle gate reset");
+//      Serial.println("Middle gate reset");
       middleTrig = false;
     }
     // Update histories
@@ -158,23 +158,10 @@ void wifiSetup() {
 
 void sendEvent(int gateID , String gateStatus , int riderCountIN , int riderCountOUT) {
     String json = buildJSON(gateID , gateStatus ,riderCountIN , riderCountOUT);
-    Serial.println("This is the json file: " + json + "\n");
-    Serial.println("Requesting POST: ");
+//    Serial.println("This is the json file: " + json + "\n");
+    Serial.println("Requesting POST\n");
      // Send request to the server:
      if (client.connect(host,80)) {
-       Serial.println("Connected to host!");
-
-//       client.println("http://iot-gate-proxy.azurewebsites.net/endpoint");
-//       client.println("POST /endpoint HTTP/1.1");
-//       client.println();
-//       client.println("Host: http://iot-gate-proxy.azurewebsites.net");
-//       client.println("Accept: */*");
-//       //client.println("Content-Type: application/x-www-form-urlencoded");
-//       client.println("Content-Type: application/json");
-//       client.print("Content-Length: ");
-//       client.println(json.length());
-//       client.println();
-//       client.println(json);
 
        String req = "";
        req += "POST /endpoint HTTP/1.1\r\n";
@@ -185,30 +172,29 @@ void sendEvent(int gateID , String gateStatus , int riderCountIN , int riderCoun
        req += "\r\n\r\n";
        req += json + "\r\n";
 
-       Serial.println(req);
+//       Serial.println(req);
        client.print(req);
      }
-
-     unsigned long timeout = millis();
-  while (client.available() == 0) {
-    yield();
-    if (millis() - timeout > 5000) {
-      Serial.println(">>> Client Timeout !");
-      client.stop();
-      return;
-    }
-  }
-     
-      // Read all the lines of the reply from server and print them to Serial
-      Serial.println("Response:");
-      while(client.available()){
-        yield();
-        String line = client.readStringUntil('\r');
-        Serial.print(line);
-      }
-    
-     Serial.println();
-     Serial.println("closing connection");
+//
+//     unsigned long timeout = millis();
+//  while (client.available() == 0) {
+//    yield();
+//    if (millis() - timeout > 2000) {
+//      Serial.println(">>> Client Timeout !");
+//      client.stop();
+//      return;
+//    }
+//  }
+//     
+//      // Read all the lines of the reply from server and print them to Serial
+//      Serial.println("Response:");
+//      while(client.available()){
+//        yield();
+//        String line = client.readStringUntil('\r');
+//        Serial.print(line);
+//      }
+//    
+//     Serial.println();
      
  }
 
