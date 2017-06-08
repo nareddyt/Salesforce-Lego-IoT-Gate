@@ -122,7 +122,12 @@ void changeState() {
     } else {
       // Else gate will stay the same
       pprinte("Keeping state the same", middleGateState);
-      sendEvent(2 , (String)middleGateState, inCount , outCount);
+      //sendEvent(2 , (String)middleGateState, inCount , outCount);
+      if (middleGateState == IN) {
+        sendEvent(2 , "IN", inCount , outCount);
+      } else {
+        sendEvent(2 , "OUT", inCount , outCount);
+      }
     }
     // Reseting counts
     inCount = 1;
@@ -158,7 +163,7 @@ void wifiSetup() {
 
 void sendEvent(int gateID , String gateStatus , int riderCountIN , int riderCountOUT) {
     String json = buildJSON(gateID , gateStatus ,riderCountIN , riderCountOUT);
-//    Serial.println("This is the json file: " + json + "\n");
+    Serial.println("This is the json file: " + json + "\n");
     Serial.println("Requesting POST\n");
      // Send request to the server:
      if (client.connect(host,80)) {
@@ -167,7 +172,7 @@ void sendEvent(int gateID , String gateStatus , int riderCountIN , int riderCoun
        req += "POST /endpoint HTTP/1.1\r\n";
        req += "Host: iot-gate-proxy.azurewebsites.net\r\n";
        req += "Accept: */*\r\n";
-       req += "Content-Type: application/x-www-form-urlencoded\r\n";
+       req += "Content-Type: application/json\r\n";
        req += "Content-Length: " + String(json.length());
        req += "\r\n\r\n";
        req += json + "\r\n";
@@ -185,7 +190,7 @@ void sendEvent(int gateID , String gateStatus , int riderCountIN , int riderCoun
 //      return;
 //    }
 //  }
-//     
+//
 //      // Read all the lines of the reply from server and print them to Serial
 //      Serial.println("Response:");
 //      while(client.available()){
@@ -199,8 +204,7 @@ void sendEvent(int gateID , String gateStatus , int riderCountIN , int riderCoun
  }
 
 String buildJSON(int gateID , String gateStatus , int riderCountIN , int riderCountOUT) {
-  // {"endpoint": "smartGatesEvent__e","payload": {"gateID__c": 1,"gateStatus__c": "IN","riderCountIN__c": 1,"riderCountOUT__c": 0}}
-  String json = "{\"endpoint\":\"smartGatesEvent__e\",\"payload\": {\"gateID__c\":";
+  String json = "{\"gateID__c\":";
   json+=gateID;
   json+=",\"gateStatus__c\":";
   json+=gateStatus;
@@ -208,6 +212,6 @@ String buildJSON(int gateID , String gateStatus , int riderCountIN , int riderCo
   json+=riderCountIN;
   json+=",\"riderCountOut__c\":";
   json+=riderCountOUT;
-  json+="}}";
+  json+="}";
   return json;
 }
