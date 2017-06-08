@@ -3,7 +3,7 @@
 
 Timer t;
 // WiFi parameters to be configured
-const char* ssid = "LegoHotspot";
+const char* ssid = "GS6";
 const char* password = "legolego";
 const char* host = "iot-gate-proxy.azurewebsites.net";
 WiFiClient client;
@@ -206,7 +206,7 @@ String buildJSON(int gateID , String gateStatus , int riderCountIN , int riderCo
   json+=gateStatus;
   json+=",\"riderCountIN__c\":";
   json+=riderCountIN;
-  json+=",\"riderCountOUT__c\":";
+  json+=",\"riderCountOut__c\":";
   json+=riderCountOUT;
   json+="}}";
   return json;
