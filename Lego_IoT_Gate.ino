@@ -3,7 +3,7 @@
 
 Timer t;
 // WiFi parameters to be configured
-const char* ssid = "GS6";
+const char* ssid = "LegoHotspot";
 const char* password = "legolego";
 const char* host = "iot-gate-proxy.azurewebsites.net";
 WiFiClient client;
@@ -122,7 +122,6 @@ void changeState() {
     } else {
       // Else gate will stay the same
       pprinte("Keeping state the same", middleGateState);
-      //sendEvent(2 , (String)middleGateState, inCount , outCount);
       if (middleGateState == IN) {
         sendEvent(2 , "IN", inCount , outCount);
       } else {
@@ -164,7 +163,7 @@ void wifiSetup() {
 void sendEvent(int gateID , String gateStatus , int riderCountIN , int riderCountOUT) {
     String json = buildJSON(gateID , gateStatus ,riderCountIN , riderCountOUT);
     Serial.println("This is the json file: " + json + "\n");
-    Serial.println("Requesting POST\n");
+    // Serial.println("Requesting POST\n");
      // Send request to the server:
      if (client.connect(host,80)) {
 
@@ -207,7 +206,9 @@ String buildJSON(int gateID , String gateStatus , int riderCountIN , int riderCo
   String json = "{\"gateID__c\":";
   json+=gateID;
   json+=",\"gateStatus__c\":";
+  json+= "\"";
   json+=gateStatus;
+  json+= "\"";
   json+=",\"riderCountIN__c\":";
   json+=riderCountIN;
   json+=",\"riderCountOut__c\":";
